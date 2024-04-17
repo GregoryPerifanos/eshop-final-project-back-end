@@ -24,10 +24,11 @@ public class Sales {
     private Long quantity;
 
 
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "order_id")
+    private Orders order;
 
-    private Long orderId;
-
-    @OneToMany(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "product_id")
-    private Long productId;
+    private Products product;
 }
