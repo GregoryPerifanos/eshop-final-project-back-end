@@ -8,7 +8,7 @@ public class EshopFinalProjectApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(EshopFinalProjectApplication.class, args);
-		System.out.println("hello there");
+		System.out.println("you created the application");
 	}
 
 }

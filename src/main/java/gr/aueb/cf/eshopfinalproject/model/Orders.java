@@ -6,6 +6,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Getter
 @Setter
@@ -22,6 +25,11 @@ public class Orders {
     @Column(name = "ORDERNUMBER", nullable = false)
     private Long orderNumber;
 
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "user_id")
+    private User user;
 
-    private Long userId; // ειναι το FK αυτο
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinColumn(name = "sales_id")
+    private List<Sales> sales = new ArrayList<Sales>();
 }
