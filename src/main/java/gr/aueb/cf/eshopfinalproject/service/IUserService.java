@@ -13,4 +13,5 @@ public interface IUserService {
     User insertUser(User user) throws UsernameAllReadyExists;
     User changePassword(Long id, String newPassword) throws IdNotFoundException;
     User addFunds(Long balance) throws IdNotFoundException;
+
 }
