@@ -8,10 +8,10 @@ import gr.aueb.cf.eshopfinalproject.service.exceptions.UsernameNotFoundException
 import java.util.List;
 
 public interface IUserService {
-    User getUserById(Long id) throws IdNotFoundException , UsernameNotFoundException;
+    User getUserById(Long id) throws IdNotFoundException ;
     List<User> getAllUsers() throws IdNotFoundException, UsernameNotFoundException;
-    User insertUser(User user) throws UsernameAllReadyExists;
+    User insertUser(User user) throws UsernameAllReadyExists, Exception;
     User changePassword(Long id, String newPassword) throws IdNotFoundException;
-    User addFunds(Long balance) throws IdNotFoundException;
+    User addFunds(Long id, Long balance) throws IdNotFoundException;
 
 }
