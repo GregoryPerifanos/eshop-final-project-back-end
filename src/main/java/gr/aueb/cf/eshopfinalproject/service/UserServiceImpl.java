@@ -71,7 +71,7 @@ public class UserServiceImpl implements IUserService {
         }
         return user;
     }
-
+    @Transactional
     @Override
     public User addFunds(Long id,Long balance) throws IdNotFoundException {
         User user = null;
