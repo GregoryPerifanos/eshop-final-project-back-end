@@ -1,5 +1,6 @@
 package gr.aueb.cf.eshopfinalproject.service;
 
+import gr.aueb.cf.eshopfinalproject.dto.UserDTO;
 import gr.aueb.cf.eshopfinalproject.model.User;
 import gr.aueb.cf.eshopfinalproject.repository.UserRepository;
 import gr.aueb.cf.eshopfinalproject.service.exceptions.IdNotFoundException;
@@ -10,53 +11,60 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 
 @Service
 @Slf4j
 public class UserServiceImpl implements IUserService {
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
     @Autowired
     public UserServiceImpl(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
-
+    @Transactional
     @Override
     public User getUserById(Long id) throws IdNotFoundException {
-        User user;
         try {
-            user = userRepository.findById(id).get();
-            if (user == null) throw new IdNotFoundException(User.class, id);
+          Optional<User> user = userRepository.findById(id);
+          if (user.isPresent()) {
+              return user.get();
+          } else {
+              throw new IdNotFoundException(User.class, id);
+          }
         } catch (IdNotFoundException e1) {
             log.info("Id not found");
             throw e1;
         }
-        return user;
-    }
-
-    @Override
-    public List<User> getAllUsers() throws IdNotFoundException, UsernameNotFoundException {
-        return List.of();
     }
 
     @Transactional
     @Override
-    public User insertUser(User user) throws UsernameAllReadyExists, Exception {
-        User user1 = null;
-        try {
-            user1 = userRepository.save(user);
-            if (user1.getId() == null) throw new Exception("Insert Error");
-            if (user1 == user) throw new UsernameAllReadyExists("User already exists");
-
-        }catch(Exception e) {
-            log.info("Exception occurred while inserting user");
-        }
-        return user1;
+    public List<User> getAllUsers() throws IdNotFoundException, UsernameNotFoundException {
+        return userRepository.findAll();
     }
+
+    @Transactional
+    @Override
+    public User insertUser(UserDTO userDTO) throws UsernameAllReadyExists, Exception {
+        try {
+            User user = ConvertToUser(userDTO);
+            if (userRepository.existsById(user.getId())) {
+                throw new UsernameAllReadyExists("Username already exists: " + user.getId());
+            }
+            userRepository.save(user);
+            return user;
+        } catch (UsernameAllReadyExists e) {
+            throw e;
+        } catch (Exception e) {
+            throw new Exception("Error while inserting user: " + e.getMessage());
+        }
+    }
+
+
 
     @Transactional
     @Override
@@ -71,17 +79,27 @@ public class UserServiceImpl implements IUserService {
         }
         return user;
     }
+
+    
     @Transactional
     @Override
     public User addFunds(Long id,Long balance) throws IdNotFoundException {
         User user = null;
         try {
             user = userRepository.findById(id).orElseThrow(() -> new IdNotFoundException(User.class, id));
-            user.setBalance(balance);
+            user.setBalance(user.getBalance() + balance);
             userRepository.save(user);
-        }catch(IdNotFoundException e) {
+        } catch (IdNotFoundException e) {
             log.info("Id not found");
         }
+        return user;
+    }
+
+    private static User ConvertToUser(UserDTO userDTO) {
+        User user = new User();
+        user.setUsername(userDTO.getUsername());
+        user.setPassword(userDTO.getPassword());
+        user.setEmail(userDTO.getEmail());
         return user;
     }
 }

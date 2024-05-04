@@ -9,10 +9,11 @@ import lombok.Setter;
 @AllArgsConstructor
 @Getter
 @Setter
-public class UserInsertDTO extends BaseDTO {
+public class UserDTO extends BaseDTO {
     private String firstname;
     private String lastname;
     private String email;
     private String password;
     private String username;
+    private Long balance;
 }
