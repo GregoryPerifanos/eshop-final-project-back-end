@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,7 +19,7 @@ import java.util.Optional;
 @Service
 @Slf4j
 public class UserServiceImpl implements IUserService {
-    @Autowired
+
     private final UserRepository userRepository;
 
     @Autowired
@@ -28,11 +29,12 @@ public class UserServiceImpl implements IUserService {
 
     @Transactional
     @Override
-    public User getUserById(Long id) throws IdNotFoundException {
+    public UserDTO getUserById(Long id) throws IdNotFoundException {
         try {
-          Optional<User> user = userRepository.findById(id);
-          if (user.isPresent()) {
-              return user.get();
+          Optional<User> optionalUser = userRepository.findById(id);
+          if (optionalUser.isPresent()) {
+             User user = optionalUser.get();
+             return convertToUserDTO(user);
           } else {
               throw new IdNotFoundException(User.class, id);
           }
@@ -44,20 +46,26 @@ public class UserServiceImpl implements IUserService {
 
     @Transactional
     @Override
-    public List<User> getAllUsers() throws IdNotFoundException, UsernameNotFoundException {
-        return userRepository.findAll();
+    public List<UserDTO> getAllUsers() throws IdNotFoundException, UsernameNotFoundException {
+        List<User> users = userRepository.findAll();
+        List<UserDTO> userDTOList = new ArrayList<>();
+
+        for (User user : users) {
+            userDTOList.add(convertToUserDTO(user));
+        }
+        return userDTOList;
     }
 
     @Transactional
     @Override
-    public User insertUser(UserDTO userDTO) throws UsernameAllReadyExists, Exception {
+    public UserDTO insertUser(UserDTO userDTO) throws UsernameAllReadyExists, Exception {
         try {
-            User user = ConvertToUser(userDTO);
-            if (userRepository.existsById(user.getId())) {
-                throw new UsernameAllReadyExists("Username already exists: " + user.getId());
+            User user = convertToUser(userDTO);
+            if (userRepository.findByUsername(user.getUsername()).isPresent()) {
+                throw new UsernameAllReadyExists("Username already exists: " + user.getUsername());
             }
-            userRepository.save(user);
-            return user;
+            User insertedUser = userRepository.save(user);
+            return convertToUserDTO(insertedUser);
         } catch (UsernameAllReadyExists e1) {
             throw e1;
         }
@@ -70,38 +78,55 @@ public class UserServiceImpl implements IUserService {
 
     @Transactional
     @Override
-    public User changePassword(Long id, String newPassword) throws IdNotFoundException {
-        User user = null;
+    public UserDTO changePassword(Long id, String newPassword) throws IdNotFoundException {
+
         try {
-            user = userRepository.findById(id).orElseThrow(() -> new IdNotFoundException(User.class, id));
+            User user = userRepository.findById(id).orElseThrow(() -> new IdNotFoundException(User.class, id));
             user.setPassword(newPassword);
             userRepository.save(user);
+            return convertToUserDTO(user);
         } catch (IdNotFoundException e) {
             log.info("Id not found");
+            throw e;
         }
-        return user;
     }
 
     
     @Transactional
     @Override
-    public User addFunds(Long id,Long balance) throws IdNotFoundException {
+    public UserDTO addFunds(Long id,Long balance) throws IdNotFoundException {
         User user = null;
         try {
             user = userRepository.findById(id).orElseThrow(() -> new IdNotFoundException(User.class, id));
             user.setBalance(user.getBalance() + balance);
             userRepository.save(user);
+            return convertToUserDTO(user);
         } catch (IdNotFoundException e) {
             log.info("Id not found");
+            throw e;
         }
-        return user;
+
     }
 
-    private static User ConvertToUser(UserDTO userDTO) {
+    private User convertToUser(UserDTO userDTO) {
         User user = new User();
+        user.setFirstName(userDTO.getFirstname());
+        user.setLastName(userDTO.getLastname());
         user.setUsername(userDTO.getUsername());
         user.setPassword(userDTO.getPassword());
         user.setEmail(userDTO.getEmail());
+        user.setBalance(userDTO.getBalance());
         return user;
+    }
+
+    private UserDTO convertToUserDTO(User user) {
+        UserDTO userDTO = new UserDTO();
+        userDTO.setFirstname(user.getFirstName());
+        userDTO.setLastname(user.getLastName());
+        userDTO.setUsername(user.getUsername());
+        userDTO.setPassword(user.getPassword());
+        userDTO.setEmail(user.getEmail());
+        userDTO.setBalance(user.getBalance());
+        return userDTO;
     }
 }

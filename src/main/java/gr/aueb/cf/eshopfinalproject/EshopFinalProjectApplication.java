@@ -20,22 +20,6 @@ public class EshopFinalProjectApplication {
 		SpringApplication.run(EshopFinalProjectApplication.class, args);
 		System.out.println("you created the application");
 
-		UserDTO userDTO = new UserDTO();
-		userDTO.setUsername("Username");
-		userDTO.setPassword("password");
-		userDTO.setFirstname("John");
-		userDTO.setLastname("Doe");
-		userDTO.setEmail("john@doe.com");
-		userDTO.setBalance(100L);
-
-		try {
-			userService.insertUser(userDTO);
-			System.out.println("User inserted successfully.");
-		} catch (Exception e) {
-			System.out.println("Error inserting user: " + e.getMessage());
-		}
-
-
 	}
 
 

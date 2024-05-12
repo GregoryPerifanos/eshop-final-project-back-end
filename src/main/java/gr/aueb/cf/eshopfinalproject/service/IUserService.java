@@ -10,12 +10,11 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@Service
 public interface IUserService {
-    User getUserById(Long id) throws IdNotFoundException ;
-    List<User> getAllUsers() throws IdNotFoundException, UsernameNotFoundException;
-    User insertUser(UserDTO userDTO) throws UsernameAllReadyExists, Exception;
-    User changePassword(Long id, String newPassword) throws IdNotFoundException;
-    User addFunds(Long id, Long balance) throws IdNotFoundException;
+    UserDTO getUserById(Long id) throws IdNotFoundException ;
+    List<UserDTO> getAllUsers() throws IdNotFoundException, UsernameNotFoundException;
+    UserDTO insertUser(UserDTO userDTO) throws UsernameAllReadyExists, Exception;
+    UserDTO changePassword(Long id, String newPassword) throws IdNotFoundException;
+    UserDTO addFunds(Long id, Long balance) throws IdNotFoundException;
 
 }
