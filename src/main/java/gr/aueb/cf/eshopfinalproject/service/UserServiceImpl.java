@@ -18,6 +18,7 @@ import java.util.Optional;
 @Service
 @Slf4j
 public class UserServiceImpl implements IUserService {
+    @Autowired
     private final UserRepository userRepository;
 
     @Autowired
@@ -57,10 +58,11 @@ public class UserServiceImpl implements IUserService {
             }
             userRepository.save(user);
             return user;
-        } catch (UsernameAllReadyExists e) {
-            throw e;
-        } catch (Exception e) {
-            throw new Exception("Error while inserting user: " + e.getMessage());
+        } catch (UsernameAllReadyExists e1) {
+            throw e1;
+        }
+        catch (Exception e2) {
+            throw new Exception("Error while inserting user: " + e2.getMessage());
         }
     }
 
