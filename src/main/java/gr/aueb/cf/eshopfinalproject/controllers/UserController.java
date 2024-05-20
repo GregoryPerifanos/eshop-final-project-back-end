@@ -2,11 +2,14 @@ package gr.aueb.cf.eshopfinalproject.controllers;
 
 
 import gr.aueb.cf.eshopfinalproject.dto.UserDTO;
-import gr.aueb.cf.eshopfinalproject.model.User;
 import gr.aueb.cf.eshopfinalproject.service.IUserService;
 import gr.aueb.cf.eshopfinalproject.service.exceptions.IdNotFoundException;
+import gr.aueb.cf.eshopfinalproject.service.exceptions.UsernameNotFoundException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/users")
@@ -30,6 +33,28 @@ public class UserController {
        }
    }
 
+    @PostMapping("/password_change")
+    public ResponseEntity<UserDTO> changePassword(@RequestParam Long userId, @RequestParam String newPassword) {
+        try {
+            UserDTO userDTO = userService.changePassword(userId, newPassword);
+            return ResponseEntity.ok(userDTO);
+        } catch (IdNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PostMapping("/add_funds")
+    public ResponseEntity<UserDTO> addFunds(@RequestParam Long userId, @RequestParam Long newBalance) {
+        try {
+            UserDTO updatedUserDTO = userService.addFunds(userId, newBalance);
+
+
+            return ResponseEntity.ok(updatedUserDTO);
+        } catch (IdNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
    @GetMapping("/get/{userId}")
    public ResponseEntity<UserDTO> getUserById(@PathVariable("userId") Long userId) {
        try {
@@ -41,6 +66,16 @@ public class UserController {
        } catch (Exception e) {
            return ResponseEntity.internalServerError().build();
        }
+   }
+
+   @GetMapping("/get_all")
+   public ResponseEntity<List<UserDTO>> getAllUsers() {
+        try {
+           List<UserDTO> userDTOs= userService.getAllUsers();
+            return ResponseEntity.ok(userDTOs);
+        } catch (UsernameNotFoundException | IdNotFoundException e){
+            return ResponseEntity.notFound().build();
+        }
    }
 
    @GetMapping("/test")

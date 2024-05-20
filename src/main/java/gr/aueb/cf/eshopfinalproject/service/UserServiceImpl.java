@@ -39,7 +39,7 @@ public class UserServiceImpl implements IUserService {
               throw new IdNotFoundException(User.class, id);
           }
         } catch (IdNotFoundException e1) {
-            log.info("Id not found");
+            log.info("User id not found");
             throw e1;
         }
     }
@@ -86,7 +86,7 @@ public class UserServiceImpl implements IUserService {
             userRepository.save(user);
             return convertToUserDTO(user);
         } catch (IdNotFoundException e) {
-            log.info("Id not found");
+            log.info("Change of Password with that id has failed");
             throw e;
         }
     }
@@ -102,7 +102,7 @@ public class UserServiceImpl implements IUserService {
             userRepository.save(user);
             return convertToUserDTO(user);
         } catch (IdNotFoundException e) {
-            log.info("Id not found");
+            log.info("Update of Funds with that id has failed");
             throw e;
         }
 
