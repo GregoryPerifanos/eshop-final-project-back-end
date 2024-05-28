@@ -21,7 +21,7 @@ public class Products {
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "ID")
     private Long id;
-    @Column(name = "SERIALNUMBER", length = 80, nullable = false)
+    @Column(name = "SERIAL_NUMBER", length = 80, nullable = false)
     private String serialNumber;
     @Column(name = "NAME" , length = 100, nullable = false, unique = true)
     private String name;
