@@ -31,7 +31,7 @@ public class Products {
     @Column(name = "QUANTITY")
     private Long quantity;
 
-    @Column(name = "DECRIPTION", length = 100, nullable = false)
+    @Column(name = "DESCRIPTION", length = 100, nullable = false)
     private String description;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
