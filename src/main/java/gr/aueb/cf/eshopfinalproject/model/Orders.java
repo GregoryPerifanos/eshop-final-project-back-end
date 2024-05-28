@@ -22,7 +22,7 @@ public class Orders {
     @Column(name = "ID")
     private Long id;
 
-    @Column(name = "ORDERNUMBER", nullable = false)
+    @Column(name = "ORDER_NUMBER", nullable = false)
     private Long orderNumber;
 
     @ManyToOne(cascade = CascadeType.ALL)
