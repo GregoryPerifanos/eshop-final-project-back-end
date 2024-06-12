@@ -2,7 +2,6 @@ package gr.aueb.cf.eshopfinalproject.service;
 
 import gr.aueb.cf.eshopfinalproject.dto.ProductsDTO;
 import gr.aueb.cf.eshopfinalproject.model.Products;
-import gr.aueb.cf.eshopfinalproject.repository.OrdersRepository;
 import gr.aueb.cf.eshopfinalproject.repository.ProductsRepository;
 import gr.aueb.cf.eshopfinalproject.service.exceptions.IdNotFoundException;
 import jakarta.transaction.Transactional;
@@ -17,12 +16,12 @@ import java.util.Optional;
 
 @Service
 @Slf4j
-public class IProductsServiceImpl implements IProductsService {
+public class ProductsServiceImpl implements IProductsService {
 
     private final ProductsRepository productsRepository;
 
     @Autowired
-    public IProductsServiceImpl(ProductsRepository productsRepository) {
+    public ProductsServiceImpl(ProductsRepository productsRepository) {
         this.productsRepository = productsRepository;
     }
 

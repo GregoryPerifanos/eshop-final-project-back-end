@@ -1,9 +1,7 @@
 package gr.aueb.cf.eshopfinalproject.service;
 
 import gr.aueb.cf.eshopfinalproject.dto.OrdersDTO;
-import gr.aueb.cf.eshopfinalproject.dto.UserDTO;
 import gr.aueb.cf.eshopfinalproject.model.Orders;
-import gr.aueb.cf.eshopfinalproject.model.User;
 import gr.aueb.cf.eshopfinalproject.repository.OrdersRepository;
 import gr.aueb.cf.eshopfinalproject.service.exceptions.IdNotFoundException;
 import jakarta.transaction.Transactional;
@@ -17,12 +15,12 @@ import java.util.Optional;
 
 @Service
 @Slf4j
-public class IOrdersServiceImpl implements IOrdersService {
+public class OrdersServiceImpl implements IOrdersService {
 
     private final OrdersRepository ordersRepository;
 
     @Autowired
-    public IOrdersServiceImpl(OrdersRepository ordersRepository) {
+    public OrdersServiceImpl(OrdersRepository ordersRepository) {
         this.ordersRepository = ordersRepository;
     }
 
@@ -55,10 +53,6 @@ public class IOrdersServiceImpl implements IOrdersService {
         }
         return ordersDTOs;
     }
-
-
-
-
 
     private Orders convertToOrders(OrdersDTO orderDTO) {
         Orders orders = new Orders();
