@@ -13,7 +13,7 @@ public class UserDTO extends BaseDTO {
     private String firstname;
     private String lastname;
     private String email;
-    private String password;
     private String username;
+    private String password;
     private Long balance;
 }

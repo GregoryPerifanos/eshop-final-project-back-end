@@ -1,16 +1,20 @@
 package gr.aueb.cf.eshopfinalproject.service;
 
+import gr.aueb.cf.eshopfinalproject.dto.CredentialsDTO;
+import gr.aueb.cf.eshopfinalproject.dto.SignUpDTO;
 import gr.aueb.cf.eshopfinalproject.dto.UserDTO;
+import gr.aueb.cf.eshopfinalproject.mappers.UserMapper;
 import gr.aueb.cf.eshopfinalproject.model.User;
 import gr.aueb.cf.eshopfinalproject.repository.UserRepository;
-import gr.aueb.cf.eshopfinalproject.service.exceptions.IdNotFoundException;
-import gr.aueb.cf.eshopfinalproject.service.exceptions.UsernameAllReadyExists;
-import gr.aueb.cf.eshopfinalproject.service.exceptions.UsernameNotFoundException;
+import gr.aueb.cf.eshopfinalproject.service.exceptions.*;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.nio.CharBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -21,10 +25,14 @@ import java.util.Optional;
 public class UserServiceImpl implements IUserService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final UserMapper userMapper;
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository) {
+    public UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder, UserMapper userMapper) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.userMapper = userMapper;
     }
 
     @Transactional
@@ -106,6 +114,32 @@ public class UserServiceImpl implements IUserService {
             throw e;
         }
 
+    }
+
+    public UserDTO login (CredentialsDTO credentialsDTO) throws UsernameAllReadyExists, PasswordNotFoundException {
+        User user = userRepository.findByUsername(credentialsDTO.username())
+                .orElseThrow(() -> new AppException("Unknown user", HttpStatus.NOT_FOUND));
+
+//        if (passwordEncoder.matches(CharBuffer.wrap(credentialsDTO.password()), user.getPassword())) {
+//            return userMapper.toUserDTO(user);
+//        }
+        if (user.getPassword().equals(credentialsDTO.password())) {
+            return userMapper.toUserDTO(user);
+        }
+        throw new PasswordNotFoundException("Password not found");
+    }
+
+    public UserDTO register (SignUpDTO signUpDTO) throws UsernameAllReadyExists, PasswordNotFoundException {
+        Optional<User> optionalUser = userRepository.findByUsername(signUpDTO.email());
+
+        if (optionalUser.isPresent()) {
+            throw new UsernameAllReadyExists("Username already exists: " + HttpStatus.BAD_REQUEST);
+        }
+
+        User user = userMapper.signUpToUser(signUpDTO);
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        User savedUser = userRepository.save(user);
+        return userMapper.toUserDTO(savedUser);
     }
 
     private User convertToUser(UserDTO userDTO) {
