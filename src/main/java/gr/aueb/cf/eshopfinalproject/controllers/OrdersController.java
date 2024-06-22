@@ -4,10 +4,7 @@ import gr.aueb.cf.eshopfinalproject.dto.OrdersDTO;
 import gr.aueb.cf.eshopfinalproject.service.IOrdersService;
 import gr.aueb.cf.eshopfinalproject.service.exceptions.IdNotFoundException;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -19,6 +16,17 @@ public class OrdersController {
 
     public OrdersController(IOrdersService ordersService) {
         this.ordersService = ordersService;
+    }
+
+    @PostMapping("/create")
+    public ResponseEntity<OrdersDTO> createOrder(OrdersDTO ordersDTO) throws IdNotFoundException {
+        try {
+            OrdersDTO insertedOrder = ordersService.insertOrder(ordersDTO);
+            return ResponseEntity.ok().body(insertedOrder);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     @GetMapping("/get/{ordersId}")

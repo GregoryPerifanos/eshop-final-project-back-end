@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -34,9 +35,10 @@ public class ProductsController {
     }
 
     @GetMapping("/get_all")
-    public ResponseEntity<List<ProductsDTO>> getAllProducts() {
+    public ResponseEntity<List<ProductsDTO>> getAllProducts(Principal principal) {
         try {
             List<ProductsDTO> productsDTOs = productsService.getAllProducts();
+            System.out.println(principal.getName());
             return ResponseEntity.ok(productsDTOs);
         } catch (IdNotFoundException e) {
             return ResponseEntity.notFound().build();

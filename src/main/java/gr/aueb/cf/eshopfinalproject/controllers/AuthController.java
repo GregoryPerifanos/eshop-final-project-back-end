@@ -1,5 +1,6 @@
 package gr.aueb.cf.eshopfinalproject.controllers;
 
+import gr.aueb.cf.eshopfinalproject.config.UserAuthProvider;
 import gr.aueb.cf.eshopfinalproject.dto.CredentialsDTO;
 import gr.aueb.cf.eshopfinalproject.dto.SignUpDTO;
 import gr.aueb.cf.eshopfinalproject.dto.UserDTO;
@@ -19,16 +20,24 @@ import java.net.URI;
 public class AuthController {
 
     private final UserServiceImpl userService;
+    private final UserAuthProvider userAuthProvider;
 
     @PostMapping("/login")
     public ResponseEntity<UserDTO> login(@RequestBody CredentialsDTO credentialsDTO) throws PasswordNotFoundException, UsernameAllReadyExists {
         UserDTO userDTO = userService.login(credentialsDTO);
+        userDTO.setPassword(userAuthProvider.createToken(userDTO));
         return ResponseEntity.ok(userDTO);
     }
 
     @PostMapping("/register")
-    public ResponseEntity<UserDTO> register(@RequestBody SignUpDTO signUpDTO) throws PasswordNotFoundException, UsernameAllReadyExists {
-        UserDTO userDTO = userService.register(signUpDTO);
-        return ResponseEntity.created(URI.create("/users/" + userDTO.getId())).body(userDTO);
+    public ResponseEntity<UserDTO> register(@RequestBody UserDTO userDTO) throws PasswordNotFoundException, UsernameAllReadyExists {
+        try {
+            UserDTO insertedUser = userService.insertUser(userDTO);
+            userDTO.setPassword(userAuthProvider.createToken(userDTO));
+            return ResponseEntity.ok(insertedUser);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }

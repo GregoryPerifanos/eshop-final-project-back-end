@@ -14,7 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.nio.CharBuffer;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -124,7 +124,7 @@ public class UserServiceImpl implements IUserService {
 //            return userMapper.toUserDTO(user);
 //        }
         if (user.getPassword().equals(credentialsDTO.password())) {
-            return userMapper.toUserDTO(user);
+            return convertToUserDTO(user);
         }
         throw new PasswordNotFoundException("Password not found");
     }
@@ -135,6 +135,7 @@ public class UserServiceImpl implements IUserService {
         if (optionalUser.isPresent()) {
             throw new UsernameAllReadyExists("Username already exists: " + HttpStatus.BAD_REQUEST);
         }
+
 
         User user = userMapper.signUpToUser(signUpDTO);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
@@ -155,6 +156,7 @@ public class UserServiceImpl implements IUserService {
 
     private UserDTO convertToUserDTO(User user) {
         UserDTO userDTO = new UserDTO();
+        userDTO.setId(user.getId());
         userDTO.setFirstname(user.getFirstName());
         userDTO.setLastname(user.getLastName());
         userDTO.setUsername(user.getUsername());

@@ -24,6 +24,23 @@ public class OrdersServiceImpl implements IOrdersService {
         this.ordersRepository = ordersRepository;
     }
 
+
+    @Transactional
+    @Override
+    public OrdersDTO insertOrder(OrdersDTO ordersDTO) throws Exception{
+        try {
+            Orders orders = convertToOrders(ordersDTO);
+            if (ordersRepository.existsById(orders.getId())) {
+                throw new Exception("Order already exists");
+            }
+            Orders insertOrder = ordersRepository.save(orders);
+            return convertToOrdersDTO(insertOrder);
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            throw e;
+        }
+    }
+
     @Transactional
     @Override
     public OrdersDTO getOrderById(Long id) throws IdNotFoundException {

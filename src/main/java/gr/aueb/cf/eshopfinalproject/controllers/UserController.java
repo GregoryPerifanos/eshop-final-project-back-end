@@ -1,9 +1,12 @@
 package gr.aueb.cf.eshopfinalproject.controllers;
 
 
+import gr.aueb.cf.eshopfinalproject.dto.CredentialsDTO;
 import gr.aueb.cf.eshopfinalproject.dto.UserDTO;
 import gr.aueb.cf.eshopfinalproject.service.IUserService;
 import gr.aueb.cf.eshopfinalproject.service.exceptions.IdNotFoundException;
+import gr.aueb.cf.eshopfinalproject.service.exceptions.PasswordNotFoundException;
+import gr.aueb.cf.eshopfinalproject.service.exceptions.UsernameAllReadyExists;
 import gr.aueb.cf.eshopfinalproject.service.exceptions.UsernameNotFoundException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -77,6 +80,7 @@ public class UserController {
             return ResponseEntity.notFound().build();
         }
    }
+   
 
    @GetMapping("/test")
     public ResponseEntity<String> test() {

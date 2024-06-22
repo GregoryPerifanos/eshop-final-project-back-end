@@ -1,8 +1,10 @@
 package gr.aueb.cf.eshopfinalproject.service;
 
+import gr.aueb.cf.eshopfinalproject.dto.CredentialsDTO;
 import gr.aueb.cf.eshopfinalproject.dto.UserDTO;
 import gr.aueb.cf.eshopfinalproject.model.User;
 import gr.aueb.cf.eshopfinalproject.service.exceptions.IdNotFoundException;
+import gr.aueb.cf.eshopfinalproject.service.exceptions.PasswordNotFoundException;
 import gr.aueb.cf.eshopfinalproject.service.exceptions.UsernameAllReadyExists;
 import gr.aueb.cf.eshopfinalproject.service.exceptions.UsernameNotFoundException;
 import jakarta.transaction.Transactional;
@@ -17,4 +19,5 @@ public interface IUserService {
     UserDTO changePassword(Long id, String newPassword) throws IdNotFoundException;
     UserDTO addFunds(Long id, Long balance) throws IdNotFoundException;
 
+    UserDTO login(CredentialsDTO credentialsDTO) throws UsernameAllReadyExists, PasswordNotFoundException;
 }

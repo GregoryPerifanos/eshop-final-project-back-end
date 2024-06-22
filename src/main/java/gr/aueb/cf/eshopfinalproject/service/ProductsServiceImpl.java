@@ -66,6 +66,7 @@ public class ProductsServiceImpl implements IProductsService {
 
     private ProductsDTO convertToProductsDTO(Products products) {
         ProductsDTO productsDTO = new ProductsDTO();
+        productsDTO.setId(products.getId());
         productsDTO.setName(products.getName());
         productsDTO.setPrice(products.getPrice());
         productsDTO.setDescription(products.getDescription());
