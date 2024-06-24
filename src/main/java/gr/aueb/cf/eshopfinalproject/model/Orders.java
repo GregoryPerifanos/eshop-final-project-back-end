@@ -22,9 +22,6 @@ public class Orders {
     @Column(name = "ID")
     private Long id;
 
-    @Column(name = "ORDER_NUMBER", nullable = false)
-    private Long orderNumber;
-
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "user_id")
     private User user;

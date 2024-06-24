@@ -1,9 +1,11 @@
 package gr.aueb.cf.eshopfinalproject.controllers;
 
 import gr.aueb.cf.eshopfinalproject.dto.ProductsDTO;
+import gr.aueb.cf.eshopfinalproject.dto.UserDTO;
 import gr.aueb.cf.eshopfinalproject.service.IProductsService;
 import gr.aueb.cf.eshopfinalproject.service.exceptions.IdNotFoundException;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -35,10 +37,12 @@ public class ProductsController {
     }
 
     @GetMapping("/get_all")
-    public ResponseEntity<List<ProductsDTO>> getAllProducts(Principal principal) {
+    public ResponseEntity<List<ProductsDTO>> getAllProducts(Authentication authentication) {
         try {
             List<ProductsDTO> productsDTOs = productsService.getAllProducts();
-            System.out.println(principal.getName());
+            System.out.println(authentication.getName());
+            UserDTO userDTO = (UserDTO) authentication.getPrincipal();
+            System.out.println(userDTO.getUsername());
             return ResponseEntity.ok(productsDTOs);
         } catch (IdNotFoundException e) {
             return ResponseEntity.notFound().build();

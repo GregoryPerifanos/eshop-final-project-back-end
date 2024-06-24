@@ -1,8 +1,16 @@
 package gr.aueb.cf.eshopfinalproject.service;
 
+import gr.aueb.cf.eshopfinalproject.dto.InsertOrderDTO;
 import gr.aueb.cf.eshopfinalproject.dto.OrdersDTO;
+import gr.aueb.cf.eshopfinalproject.dto.ProductsDTO;
 import gr.aueb.cf.eshopfinalproject.model.Orders;
+import gr.aueb.cf.eshopfinalproject.model.Products;
+import gr.aueb.cf.eshopfinalproject.model.Sales;
+import gr.aueb.cf.eshopfinalproject.model.User;
 import gr.aueb.cf.eshopfinalproject.repository.OrdersRepository;
+import gr.aueb.cf.eshopfinalproject.repository.ProductsRepository;
+import gr.aueb.cf.eshopfinalproject.repository.SalesRepository;
+import gr.aueb.cf.eshopfinalproject.repository.UserRepository;
 import gr.aueb.cf.eshopfinalproject.service.exceptions.IdNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
@@ -18,23 +26,47 @@ import java.util.Optional;
 public class OrdersServiceImpl implements IOrdersService {
 
     private final OrdersRepository ordersRepository;
+    private final UserRepository userRepository;
+    private final SalesRepository salesRepository;
+    private final ProductsRepository productsRepository;
 
     @Autowired
-    public OrdersServiceImpl(OrdersRepository ordersRepository) {
+    public OrdersServiceImpl(OrdersRepository ordersRepository, UserRepository userRepository, SalesRepository salesRepository, ProductsRepository productsRepository) {
         this.ordersRepository = ordersRepository;
+        this.userRepository = userRepository;
+        this.salesRepository = salesRepository;
+        this.productsRepository = productsRepository;
     }
 
 
     @Transactional
     @Override
-    public OrdersDTO insertOrder(OrdersDTO ordersDTO) throws Exception{
+    public OrdersDTO insertOrder(InsertOrderDTO insertOrderDTO, String username) throws Exception{
         try {
-            Orders orders = convertToOrders(ordersDTO);
-            if (ordersRepository.existsById(orders.getId())) {
-                throw new Exception("Order already exists");
+            Optional<User> user = userRepository.findByUsername(username);
+            if (user.isEmpty()) {
+                throw new RuntimeException("User does not exists");
             }
-            Orders insertOrder = ordersRepository.save(orders);
-            return convertToOrdersDTO(insertOrder);
+            User currentUser = user.get();
+            List<ProductsDTO> productsList = insertOrderDTO.getProductsDTOList();
+            Double totalValue = 0.0;
+            for (ProductsDTO productsDTO : productsList) {
+               totalValue += productsDTO.getPrice();
+            }
+            if (totalValue > currentUser.getBalance()) {
+                throw new RuntimeException("Insufficient balance");
+            }
+            Orders orders = new Orders();
+            orders.setUser(currentUser);
+            Orders insertedOrders = ordersRepository.saveAndFlush(orders);
+            for (ProductsDTO productsDTO : productsList) {
+                Sales sales = new Sales();
+                sales.setQuantity(1L);
+                sales.setOrder(insertedOrders);
+                sales.setProduct(productsRepository.getOne(productsDTO.getId()));
+                salesRepository.save(sales);
+            }
+            return convertToOrdersDTO(insertedOrders);
         } catch (Exception e) {
             log.error(e.getMessage());
             throw e;
@@ -73,7 +105,6 @@ public class OrdersServiceImpl implements IOrdersService {
 
     private Orders convertToOrders(OrdersDTO orderDTO) {
         Orders orders = new Orders();
-        orders.setOrderNumber(orders.getOrderNumber());
         orders.setId(orders.getId());
         return orders;
     }
@@ -81,7 +112,6 @@ public class OrdersServiceImpl implements IOrdersService {
     private OrdersDTO convertToOrdersDTO(Orders orders) {
        OrdersDTO ordersDTO = new OrdersDTO();
        ordersDTO.setId(orders.getId());
-       ordersDTO.setOrderId(ordersDTO.getOrderId());
        return ordersDTO;
     }
 }

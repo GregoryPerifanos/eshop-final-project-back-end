@@ -1,9 +1,12 @@
 package gr.aueb.cf.eshopfinalproject.controllers;
 
+import gr.aueb.cf.eshopfinalproject.dto.InsertOrderDTO;
 import gr.aueb.cf.eshopfinalproject.dto.OrdersDTO;
+import gr.aueb.cf.eshopfinalproject.dto.UserDTO;
 import gr.aueb.cf.eshopfinalproject.service.IOrdersService;
 import gr.aueb.cf.eshopfinalproject.service.exceptions.IdNotFoundException;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,9 +22,11 @@ public class OrdersController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<OrdersDTO> createOrder(OrdersDTO ordersDTO) throws IdNotFoundException {
+    public ResponseEntity<OrdersDTO> createOrder(@RequestBody InsertOrderDTO insertOrderDTO, Authentication authentication) throws IdNotFoundException {
         try {
-            OrdersDTO insertedOrder = ordersService.insertOrder(ordersDTO);
+            UserDTO userDTO = (UserDTO) authentication.getPrincipal();
+            System.out.println(userDTO.getUsername());
+            OrdersDTO insertedOrder = ordersService.insertOrder(insertOrderDTO, userDTO.getUsername());
             return ResponseEntity.ok().body(insertedOrder);
         } catch (Exception e) {
             e.printStackTrace();

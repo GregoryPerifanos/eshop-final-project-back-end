@@ -38,6 +38,8 @@ public class Products {
     @JoinColumn(name = "sales_id")
     private List<Sales> sales = new ArrayList<Sales>();
 
-
+    public Products(Long id) {
+        this.id = id;
+    }
 
 }

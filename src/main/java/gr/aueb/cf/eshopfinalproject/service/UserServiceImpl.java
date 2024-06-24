@@ -120,28 +120,12 @@ public class UserServiceImpl implements IUserService {
         User user = userRepository.findByUsername(credentialsDTO.username())
                 .orElseThrow(() -> new AppException("Unknown user", HttpStatus.NOT_FOUND));
 
-//        if (passwordEncoder.matches(CharBuffer.wrap(credentialsDTO.password()), user.getPassword())) {
-//            return userMapper.toUserDTO(user);
-//        }
         if (user.getPassword().equals(credentialsDTO.password())) {
             return convertToUserDTO(user);
         }
         throw new PasswordNotFoundException("Password not found");
     }
 
-    public UserDTO register (SignUpDTO signUpDTO) throws UsernameAllReadyExists, PasswordNotFoundException {
-        Optional<User> optionalUser = userRepository.findByUsername(signUpDTO.email());
-
-        if (optionalUser.isPresent()) {
-            throw new UsernameAllReadyExists("Username already exists: " + HttpStatus.BAD_REQUEST);
-        }
-
-
-        User user = userMapper.signUpToUser(signUpDTO);
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        User savedUser = userRepository.save(user);
-        return userMapper.toUserDTO(savedUser);
-    }
 
     private User convertToUser(UserDTO userDTO) {
         User user = new User();
