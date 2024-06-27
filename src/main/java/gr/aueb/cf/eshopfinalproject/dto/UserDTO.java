@@ -13,5 +13,5 @@ public class UserDTO extends BaseDTO {
     private String email;
     private String username;
     private String password;
-    private Long balance;
+    private Double balance;
 }

@@ -13,7 +13,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-
+/**
+ * Implementation of the IProductsService interface, providing services related to products.
+ */
 @Service
 @Slf4j
 public class ProductsServiceImpl implements IProductsService {
@@ -25,6 +27,13 @@ public class ProductsServiceImpl implements IProductsService {
         this.productsRepository = productsRepository;
     }
 
+    /**
+     * Retrieves a product by its ID.
+     *
+     * @param id the ID of the product to retrieve
+     * @return the retrieved product as a ProductsDTO
+     * @throws IdNotFoundException if no product with the specified ID is found
+     */
     @Transactional
     @Override
     public ProductsDTO getProductsById(Long id) throws IdNotFoundException {
@@ -42,9 +51,14 @@ public class ProductsServiceImpl implements IProductsService {
         }
     }
 
+    /**
+     * Retrieves all products.
+     *
+     * @return a list of all products as ProductsDTOs
+     */
     @Transactional
     @Override
-    public List<ProductsDTO> getAllProducts() throws IdNotFoundException {
+    public List<ProductsDTO> getAllProducts() {
         List<Products> products = productsRepository.findAll();
         List<ProductsDTO> productsDTOs = new ArrayList<>();
 
@@ -54,6 +68,12 @@ public class ProductsServiceImpl implements IProductsService {
         return productsDTOs;
     }
 
+    /**
+     * Converts a ProductsDTO to a Products entity.
+     *
+     * @param productsDTO the DTO to convert
+     * @return the converted Products entity
+     */
     private Products convertToProducts(ProductsDTO productsDTO) {
         Products products = new Products();
         products.setName(productsDTO.getName());
@@ -64,6 +84,12 @@ public class ProductsServiceImpl implements IProductsService {
         return products;
     }
 
+    /**
+     * Converts a Products entity to a ProductsDTO.
+     *
+     * @param products the entity to convert
+     * @return the converted ProductsDTO
+     */
     private ProductsDTO convertToProductsDTO(Products products) {
         ProductsDTO productsDTO = new ProductsDTO();
         productsDTO.setId(products.getId());

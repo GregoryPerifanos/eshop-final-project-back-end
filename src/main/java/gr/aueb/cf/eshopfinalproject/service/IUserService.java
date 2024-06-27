@@ -16,8 +16,8 @@ public interface IUserService {
     UserDTO getUserById(Long id) throws IdNotFoundException ;
     List<UserDTO> getAllUsers() throws IdNotFoundException, UsernameNotFoundException;
     UserDTO insertUser(UserDTO userDTO) throws UsernameAllReadyExists, Exception;
-    UserDTO changePassword(Long id, String newPassword) throws IdNotFoundException;
-    UserDTO addFunds(Long id, Long balance) throws IdNotFoundException;
+    UserDTO changePassword(String userName, String newPassword) throws UsernameAllReadyExists, Exception;
+    UserDTO addFunds(String userName, Double balance) throws UsernameAllReadyExists, Exception;
 
     UserDTO login(CredentialsDTO credentialsDTO) throws UsernameAllReadyExists, PasswordNotFoundException;
 }

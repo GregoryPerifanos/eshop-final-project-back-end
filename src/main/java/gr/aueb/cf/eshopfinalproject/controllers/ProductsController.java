@@ -11,19 +11,32 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.security.Principal;
 import java.util.List;
 
+/**
+ * ProductsController handles product-related HTTP requests and responses.
+ */
 @RestController
 @RequestMapping("/products")
 public class ProductsController {
 
     private final IProductsService productsService;
 
+    /**
+     * Constructs a ProductsController with the specified IProductsService.
+     *
+     * @param productsService the products service to be used
+     */
     public ProductsController(IProductsService productsService) {
         this.productsService = productsService;
     }
 
+    /**
+     * Retrieves a product by its ID.
+     *
+     * @param productsId the ID of the product to be retrieved
+     * @return the product with the specified ID
+     */
     @GetMapping("/get/{productsId}")
     public ResponseEntity<ProductsDTO> getProductsById(@PathVariable("productsId") Long productsId) {
         try {
@@ -36,6 +49,12 @@ public class ProductsController {
         }
     }
 
+    /**
+     * Retrieves all products.
+     *
+     * @param authentication the authentication object containing the user's authentication details
+     * @return a list of all products
+     */
     @GetMapping("/get_all")
     public ResponseEntity<List<ProductsDTO>> getAllProducts(Authentication authentication) {
         try {
@@ -46,6 +65,8 @@ public class ProductsController {
             return ResponseEntity.ok(productsDTOs);
         } catch (IdNotFoundException e) {
             return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
         }
     }
 }
