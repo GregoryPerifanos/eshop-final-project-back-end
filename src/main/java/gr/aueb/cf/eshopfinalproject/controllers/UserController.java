@@ -1,14 +1,17 @@
 package gr.aueb.cf.eshopfinalproject.controllers;
 
 
-import gr.aueb.cf.eshopfinalproject.dto.CredentialsDTO;
+import gr.aueb.cf.eshopfinalproject.dto.AddFundsDTO;
+import gr.aueb.cf.eshopfinalproject.dto.NewPasswordDTO;
 import gr.aueb.cf.eshopfinalproject.dto.UserDTO;
+import gr.aueb.cf.eshopfinalproject.repository.UserRepository;
 import gr.aueb.cf.eshopfinalproject.service.IUserService;
 import gr.aueb.cf.eshopfinalproject.service.exceptions.IdNotFoundException;
-import gr.aueb.cf.eshopfinalproject.service.exceptions.PasswordNotFoundException;
 import gr.aueb.cf.eshopfinalproject.service.exceptions.UsernameAllReadyExists;
 import gr.aueb.cf.eshopfinalproject.service.exceptions.UsernameNotFoundException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -19,9 +22,11 @@ import java.util.List;
 public class UserController {
 
     private final IUserService userService;
+    private final UserRepository userRepository;
 
-    public UserController(IUserService userService) {
+    public UserController(IUserService userService, UserRepository userRepository) {
         this.userService = userService;
+        this.userRepository = userRepository;
     }
 
 
@@ -37,24 +42,25 @@ public class UserController {
    }
 
     @PostMapping("/password_change")
-    public ResponseEntity<UserDTO> changePassword(@RequestParam Long userId, @RequestParam String newPassword) {
+    public ResponseEntity<UserDTO> changePassword(@RequestBody NewPasswordDTO newPasswordDTO, Authentication authentication) {
         try {
-            UserDTO userDTO = userService.changePassword(userId, newPassword);
-            return ResponseEntity.ok(userDTO);
-        } catch (IdNotFoundException e) {
-            return ResponseEntity.notFound().build();
+            UserDTO userDTO = (UserDTO) authentication.getPrincipal();
+            UserDTO updatedUserDTO = userService.changePassword(userDTO.getUsername(), newPasswordDTO.getNewPassword());
+            return ResponseEntity.ok().body(updatedUserDTO);
+        } catch (Exception e1) {
+            e1.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
     @PostMapping("/add_funds")
-    public ResponseEntity<UserDTO> addFunds(@RequestParam Long userId, @RequestParam Long newBalance) {
+    public ResponseEntity<UserDTO> addFunds(@RequestBody AddFundsDTO addFundsDTO, Authentication authentication) {
         try {
-            UserDTO updatedUserDTO = userService.addFunds(userId, newBalance);
-
-
-            return ResponseEntity.ok(updatedUserDTO);
-        } catch (IdNotFoundException e) {
-            return ResponseEntity.notFound().build();
+            UserDTO userDTO = (UserDTO) authentication.getPrincipal();
+            UserDTO updatedUserDTO = userService.addFunds(userDTO.getUsername(), addFundsDTO.getBalance());
+            return ResponseEntity.ok().body(updatedUserDTO);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -80,24 +86,4 @@ public class UserController {
             return ResponseEntity.notFound().build();
         }
    }
-   
-
-   @GetMapping("/test")
-    public ResponseEntity<String> test() {
-       UserDTO userDTO = new UserDTO();
-       userDTO.setUsername("Username");
-       userDTO.setPassword("password");
-       userDTO.setFirstname("John");
-       userDTO.setLastname("Doe");
-       userDTO.setEmail("john@doe.com");
-       userDTO.setBalance(100L);
-
-       try {
-           userService.insertUser(userDTO);
-           System.out.println("User inserted successfully.");
-       } catch (Exception e) {
-           System.out.println("Error inserting user: " + e.getMessage());
-       }
-       return ResponseEntity.ok("User inserted successfully.");
-    }
 }

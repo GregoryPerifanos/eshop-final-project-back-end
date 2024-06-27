@@ -53,9 +53,16 @@ public class OrdersServiceImpl implements IOrdersService {
             for (ProductsDTO productsDTO : productsList) {
                totalValue += productsDTO.getPrice();
             }
+
+            Long totalValueLong = Math.round(totalValue);
+
             if (totalValue > currentUser.getBalance()) {
                 throw new RuntimeException("Insufficient balance");
             }
+
+            currentUser.setBalance(currentUser.getBalance() - totalValueLong);
+            userRepository.save(currentUser);
+
             Orders orders = new Orders();
             orders.setUser(currentUser);
             Orders insertedOrders = ordersRepository.saveAndFlush(orders);

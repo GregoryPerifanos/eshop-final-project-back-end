@@ -35,11 +35,11 @@ public class User {
     @Column(name = "USERNAME" , length = 20, nullable = false, unique = true)
     private String username;
 
-    @Column(name = "PASSWORD" , length = 16, nullable = false, unique = false)
+    @Column(name = "PASSWORD" , length = 60, nullable = false, unique = false)
     private String password;
 
     @Column(name = "BALANCE" , nullable = false)
-    private Long balance;
+    private Double balance;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "order_id")

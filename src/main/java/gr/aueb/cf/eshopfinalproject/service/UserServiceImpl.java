@@ -1,7 +1,6 @@
 package gr.aueb.cf.eshopfinalproject.service;
 
 import gr.aueb.cf.eshopfinalproject.dto.CredentialsDTO;
-import gr.aueb.cf.eshopfinalproject.dto.SignUpDTO;
 import gr.aueb.cf.eshopfinalproject.dto.UserDTO;
 import gr.aueb.cf.eshopfinalproject.mappers.UserMapper;
 import gr.aueb.cf.eshopfinalproject.model.User;
@@ -11,6 +10,7 @@ import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -86,15 +86,22 @@ public class UserServiceImpl implements IUserService {
 
     @Transactional
     @Override
-    public UserDTO changePassword(Long id, String newPassword) throws IdNotFoundException {
-
+    public UserDTO changePassword(String userName, String newPassword) throws Exception {
         try {
-            User user = userRepository.findById(id).orElseThrow(() -> new IdNotFoundException(User.class, id));
-            user.setPassword(newPassword);
-            userRepository.save(user);
-            return convertToUserDTO(user);
-        } catch (IdNotFoundException e) {
-            log.info("Change of Password with that id has failed");
+            if (newPassword == null || newPassword.isEmpty()) {
+                throw new IllegalArgumentException("Password cannot be null or empty.");
+            }
+            Optional<User> optionalUser = userRepository.findByUsername(userName);
+            if (optionalUser.isPresent()) {
+                User user = optionalUser.get();
+                user.setPassword(newPassword);
+                userRepository.save(user);
+                return convertToUserDTO(user);
+            } else {
+                throw new UsernameNotFoundException("Username not found: " + userName);
+            }
+        } catch (Exception e) {
+            log.info("Change of Password with that username has failed", e);
             throw e;
         }
     }
@@ -102,15 +109,19 @@ public class UserServiceImpl implements IUserService {
     
     @Transactional
     @Override
-    public UserDTO addFunds(Long id,Long balance) throws IdNotFoundException {
-        User user = null;
+    public UserDTO addFunds(String userName, Double newBalance) throws UsernameAllReadyExists {
         try {
-            user = userRepository.findById(id).orElseThrow(() -> new IdNotFoundException(User.class, id));
-            user.setBalance(user.getBalance() + balance);
-            userRepository.save(user);
-            return convertToUserDTO(user);
-        } catch (IdNotFoundException e) {
-            log.info("Update of Funds with that id has failed");
+            Optional<User> user = userRepository.findByUsername(userName);
+            if (user.isPresent()) {
+                User existingUser = user.get();
+                existingUser.setBalance(user.get().getBalance() + newBalance);
+                userRepository.save(existingUser);
+                return convertToUserDTO(existingUser);
+            } else {
+                throw new UsernameAllReadyExists("Username not found: " + userName);
+            }
+        } catch (UsernameAllReadyExists e) {
+            log.info("Update of Funds with that username has failed");
             throw e;
         }
 
