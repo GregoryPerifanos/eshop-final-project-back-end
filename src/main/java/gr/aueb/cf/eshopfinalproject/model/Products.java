@@ -21,7 +21,7 @@ public class Products {
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "ID")
     private Long id;
-    @Column(name = "SERIALNUMBER", length = 80, nullable = false)
+    @Column(name = "SERIAL_NUMBER", length = 80, nullable = false)
     private String serialNumber;
     @Column(name = "NAME" , length = 100, nullable = false, unique = true)
     private String name;
@@ -31,13 +31,15 @@ public class Products {
     @Column(name = "QUANTITY")
     private Long quantity;
 
-    @Column(name = "DECRIPTION", length = 100, nullable = false)
+    @Column(name = "DESCRIPTION", length = 100, nullable = false)
     private String description;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "sales_id")
     private List<Sales> sales = new ArrayList<Sales>();
 
-
+    public Products(Long id) {
+        this.id = id;
+    }
 
 }
