@@ -11,16 +11,32 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+/**
+ * OrdersController handles order-related HTTP requests and responses.
+ */
 @RestController
 @RequestMapping("/orders")
 public class OrdersController {
 
     private final IOrdersService ordersService;
 
+    /**
+     * Constructs an OrdersController with the specified IOrdersService.
+     *
+     * @param ordersService the orders service to be used
+     */
     public OrdersController(IOrdersService ordersService) {
         this.ordersService = ordersService;
     }
 
+    /**
+     * Creates a new order.
+     *
+     * @param insertOrderDTO the order data transfer object containing order details
+     * @param authentication the authentication object containing the user's authentication details
+     * @return the created order
+     * @throws IdNotFoundException if the user ID is not found
+     */
     @PostMapping("/create")
     public ResponseEntity<OrdersDTO> createOrder(@RequestBody InsertOrderDTO insertOrderDTO, Authentication authentication) throws IdNotFoundException {
         try {
@@ -34,6 +50,12 @@ public class OrdersController {
         }
     }
 
+    /**
+     * Retrieves an order by its ID.
+     *
+     * @param ordersId the ID of the order to be retrieved
+     * @return the order with the specified ID
+     */
     @GetMapping("/get/{ordersId}")
     public ResponseEntity<OrdersDTO> getOrders(@PathVariable("ordersId") Long ordersId) {
         try {
@@ -46,6 +68,11 @@ public class OrdersController {
         }
     }
 
+    /**
+     * Retrieves all orders.
+     *
+     * @return a list of all orders
+     */
     @GetMapping("/get_all")
     public ResponseEntity<List<OrdersDTO>> getAllOrders() {
         try {

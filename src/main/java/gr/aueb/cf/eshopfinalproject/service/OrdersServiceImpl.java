@@ -21,6 +21,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Implementation of the IOrdersService interface, providing services related to orders.
+ */
 @Service
 @Slf4j
 public class OrdersServiceImpl implements IOrdersService {
@@ -38,20 +41,27 @@ public class OrdersServiceImpl implements IOrdersService {
         this.productsRepository = productsRepository;
     }
 
-
+    /**
+     * Inserts a new order for the specified user.
+     *
+     * @param insertOrderDTO the DTO containing the order details
+     * @param username       the username of the user placing the order
+     * @return the inserted order as an OrdersDTO
+     * @throws Exception if any error occurs during the process
+     */
     @Transactional
     @Override
-    public OrdersDTO insertOrder(InsertOrderDTO insertOrderDTO, String username) throws Exception{
+    public OrdersDTO insertOrder(InsertOrderDTO insertOrderDTO, String username) throws Exception {
         try {
             Optional<User> user = userRepository.findByUsername(username);
             if (user.isEmpty()) {
-                throw new RuntimeException("User does not exists");
+                throw new RuntimeException("User does not exist");
             }
             User currentUser = user.get();
             List<ProductsDTO> productsList = insertOrderDTO.getProductsDTOList();
             Double totalValue = 0.0;
             for (ProductsDTO productsDTO : productsList) {
-               totalValue += productsDTO.getPrice();
+                totalValue += productsDTO.getPrice();
             }
 
             Long totalValueLong = Math.round(totalValue);
@@ -80,6 +90,13 @@ public class OrdersServiceImpl implements IOrdersService {
         }
     }
 
+    /**
+     * Retrieves an order by its ID.
+     *
+     * @param id the ID of the order to retrieve
+     * @return the retrieved order as an OrdersDTO
+     * @throws IdNotFoundException if no order with the specified ID is found
+     */
     @Transactional
     @Override
     public OrdersDTO getOrderById(Long id) throws IdNotFoundException {
@@ -91,13 +108,17 @@ public class OrdersServiceImpl implements IOrdersService {
             } else {
                 throw new IdNotFoundException(Orders.class, id);
             }
-
         } catch (Exception e) {
-            log.info("Order id not found");
+            log.info("Order ID not found");
             throw e;
         }
     }
 
+    /**
+     * Retrieves all orders.
+     *
+     * @return a list of all orders as OrdersDTOs
+     */
     @Transactional
     @Override
     public List<OrdersDTO> gelAllOrders() {
@@ -110,15 +131,27 @@ public class OrdersServiceImpl implements IOrdersService {
         return ordersDTOs;
     }
 
+    /**
+     * Converts an OrdersDTO to an Orders entity.
+     *
+     * @param orderDTO the DTO to convert
+     * @return the converted Orders entity
+     */
     private Orders convertToOrders(OrdersDTO orderDTO) {
         Orders orders = new Orders();
         orders.setId(orders.getId());
         return orders;
     }
 
+    /**
+     * Converts an Orders entity to an OrdersDTO.
+     *
+     * @param orders the entity to convert
+     * @return the converted OrdersDTO
+     */
     private OrdersDTO convertToOrdersDTO(Orders orders) {
-       OrdersDTO ordersDTO = new OrdersDTO();
-       ordersDTO.setId(orders.getId());
-       return ordersDTO;
+        OrdersDTO ordersDTO = new OrdersDTO();
+        ordersDTO.setId(orders.getId());
+        return ordersDTO;
     }
 }
